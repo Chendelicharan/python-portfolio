@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Panel | Portfolio CMS{% endblock %}</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <!-- Admin Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+
+    <!-- 1. Sidebar -->
+    <div class="admin-sidebar">
+        <div class="sidebar-brand">
+            PORTFOLIO CMS
+        </div>
+        <div class="sidebar-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link {% if request.path == url_for('admin.dashboard') %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+            <a href="{{ url_for('admin.edit_about') }}" class="sidebar-link {% if request.path == url_for('admin.edit_about') %}active{% endif %}">
+                <i class="fas fa-user-edit"></i> About Me
+            </a>
+            <a href="{{ url_for('admin.skills') }}" class="sidebar-link {% if request.path == url_for('admin.skills') %}active{% endif %}">
+                <i class="fas fa-laptop-code"></i> Skills
+            </a>
+            <a href="{{ url_for('admin.projects') }}" class="sidebar-link {% if request.path == url_for('admin.projects') %}active{% endif %}">
+                <i class="fas fa-project-diagram"></i> Projects
+            </a>
+            <a href="{{ url_for('admin.certificates') }}" class="sidebar-link {% if request.path == url_for('admin.certificates') %}active{% endif %}">
+                <i class="fas fa-certificate"></i> Certificates
+            </a>
+            <a href="{{ url_for('admin.achievements') }}" class="sidebar-link {% if request.path == url_for('admin.achievements') or request.path == url_for('admin.achievements') %}active{% endif %}">
+                <i class="fas fa-trophy"></i> Achievements
+            </a>
+            <a href="{{ url_for('admin.messages') }}" class="sidebar-link {% if request.path == url_for('admin.messages') %}active{% endif %}">
+                <i class="fas fa-envelope"></i> Messages
+            </a>
+            <a href="{{ url_for('admin.settings') }}" class="sidebar-link {% if request.path == url_for('admin.settings') %}active{% endif %}">
+                <i class="fas fa-cogs"></i> Settings
+            </a>
+            <hr class="border-secondary mx-3">
+            <a href="{{ url_for('auth.logout') }}" class="sidebar-link text-danger">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- 2. Main Wrapper -->
+    <div class="admin-wrapper">
+        
+        <!-- Top Navbar -->
+        <div class="admin-topbar shadow-sm">
+            <div class="d-flex align-items-center">
+                <button id="sidebar-toggle" class="btn btn-outline-secondary d-lg-none me-3">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h4 class="mb-0 font-outfit">{% block page_title %}Dashboard{% endblock %}</h4>
+            </div>
+            <div class="d-flex align-items-center">
+                <a href="{{ url_for('main.index') }}" target="_blank" class="btn btn-sm btn-outline-primary me-3">
+                    <i class="fas fa-external-link-alt me-1"></i> View Portfolio
+                </a>
+                <span class="text-muted d-none d-md-inline small me-2">Welcome,</span>
+                <span class="fw-semibold small">{{ current_user.username }}</span>
+            </div>
+        </div>
+
+        <!-- Flash messages inside admin -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert" style="border-radius: 10px;">
+                        <i class="fas {{ 'fa-check-circle' if category == 'success' else 'fa-exclamation-circle' }} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Dynamic Page Contents -->
+        {% block content %}{% endblock %}
+
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Admin JS -->
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

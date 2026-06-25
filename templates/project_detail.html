@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }} | {{ socials.site_name or 'Portfolio' }}{% endblock %}
+
+{% block meta_description %}{{ project.description[:150] }}{% endblock %}
+
+{% block content %}
+<section class="section-padding" style="margin-top: 80px; min-height: 85vh;">
+    <div class="container">
+        
+        <!-- Back Link -->
+        <a href="{{ url_for('main.index') }}#projects" class="btn btn-premium-outline mb-5">
+            <i class="fas fa-arrow-left me-2"></i>Back to Projects
+        </a>
+
+        <div class="row">
+            <!-- Project Main Info / Gallery -->
+            <div class="col-lg-7 mb-4">
+                <div class="glass-card reveal">
+                    <!-- Carousel for screenshots -->
+                    <div id="projectScreenshotCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+                        <div class="carousel-inner rounded-4 overflow-hidden border border-secondary-subtle">
+                            <!-- Primary Image first -->
+                            <div class="carousel-item active" style="height: 380px;">
+                                {% if project.primary_image %}
+                                    <img src="{{ url_for('static', filename=project.primary_image) }}" class="d-block w-100 h-100 object-fit-cover" alt="{{ project.title }}">
+                                {% else %}
+                                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?fit=crop&w=800&h=450" class="d-block w-100 h-100 object-fit-cover" alt="Placeholder image">
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Secondary screenshots -->
+                            {% if project.screenshots %}
+                                {% for shot in project.screenshots %}
+                                    <div class="carousel-item" style="height: 380px;">
+                                        <img src="{{ url_for('static', filename=shot.image_path) }}" class="d-block w-100 h-100 object-fit-cover lightbox-trigger" alt="Screenshot {{ loop.index }}">
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        {% if project.screenshots %}
+                            <button class="carousel-control-prev" type="button" data-bs-target="#projectScreenshotCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true" style="padding: 15px;"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#projectScreenshotCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true" style="padding: 15px;"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <!-- Tech Badges -->
+                    <div class="mb-4">
+                        <h5 class="small text-muted mb-2">Technologies Used</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for tech in project.technologies.split(',') %}
+                                <span class="tech-badge" style="font-size: 0.85rem; padding: 6px 12px;">{{ tech.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Details / Sidebar links -->
+            <div class="col-lg-5 mb-4">
+                <div class="glass-card h-100 reveal d-flex flex-column justify-content-between">
+                    <div>
+                        <span class="text-primary small fw-semibold d-block mb-2">{{ project.date or 'Completion Date' }}</span>
+                        <h2 class="mb-4 font-outfit">{{ project.title }}</h2>
+                        
+                        <h5 class="small text-muted mb-2">Project Overview</h5>
+                        <p class="text-secondary mb-4" style="white-space: pre-line; line-height: 1.7;">
+                            {{ project.description }}
+                        </p>
+                    </div>
+
+                    <div class="pt-4 border-top border-secondary-subtle">
+                        <div class="row g-2">
+                            {% if project.github_url %}
+                                <div class="col-6">
+                                    <a href="{{ project.github_url }}" target="_blank" class="btn btn-premium-outline w-100 py-3">
+                                        <i class="fab fa-github me-2"></i>Code Repository
+                                    </a>
+                                </div>
+                            {% endif %}
+                            
+                            {% if project.demo_url %}
+                                <div class="col-6">
+                                    <a href="{{ project.demo_url }}" target="_blank" class="btn btn-premium w-100 py-3">
+                                        <i class="fas fa-external-link-alt me-2"></i>Live Demo
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Project File Downloads -->
+                        {% if project.project_file %}
+                            <div class="mt-4">
+                                <span class="text-muted small d-block mb-2">Attached Project Assets</span>
+                                <a href="{{ url_for('static', filename=project.project_file) }}" download class="btn btn-secondary btn-sm w-100 py-2" style="background-color: var(--bg-secondary); border: 1px solid var(--border-glass);">
+                                    <i class="fas fa-paperclip me-2"></i>Download Resources (ZIP/DOCX/PDF)
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

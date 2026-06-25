@@ -1,0 +1,469 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- 1. Hero Section -->
+<section id="home" class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 order-2 order-lg-1 text-center text-lg-start">
+                <div class="reveal">
+                    <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill mb-3">Welcome to my Space</span>
+                    <h1 class="hero-title mb-3">Hi, I'm <span>{{ about.name or 'John Doe' }}</span></h1>
+                    <h3 class="mb-4">A <span id="typed-text" class="typed-text" data-words='["{{ about.title or "Full Stack Developer" }}", "Problem Solver", "Tech Enthusiast"]'></span></h3>
+                    <p class="lead text-secondary mb-5">
+                        {{ about.bio or 'Passionate software engineer building premium interactive websites and robust backend applications.' }}
+                    </p>
+                    <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3 mb-5">
+                        <a href="#contact" class="btn-premium">Hire Me</a>
+                        {% if about.resume_path %}
+                            <a href="{{ url_for('static', filename=about.resume_path) }}" download class="btn-premium-outline">
+                                <i class="fas fa-download me-2"></i>Download Resume
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="social-icons-hero">
+                        {% if socials.github_url %}<a href="{{ socials.github_url }}" target="_blank"><i class="fab fa-github"></i></a>{% endif %}
+                        {% if socials.linkedin_url %}<a href="{{ socials.linkedin_url }}" target="_blank"><i class="fab fa-linkedin"></i></a>{% endif %}
+                        {% if socials.twitter_url %}<a href="{{ socials.twitter_url }}" target="_blank"><i class="fab fa-twitter"></i></a>{% endif %}
+                        {% if socials.facebook_url %}<a href="{{ socials.facebook_url }}" target="_blank"><i class="fab fa-facebook"></i></a>{% endif %}
+                        {% if socials.instagram_url %}<a href="{{ socials.instagram_url }}" target="_blank"><i class="fab fa-instagram"></i></a>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 order-1 order-lg-2 mb-5 mb-lg-0 text-center">
+                <div class="reveal">
+                    <div class="hero-img-container">
+                        {% if about.photo_path %}
+                            <img src="{{ url_for('static', filename=about.photo_path) }}" alt="{{ about.name }}" class="hero-img">
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fit=crop&w=400&h=400" alt="Placeholder Avatar" class="hero-img">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. About Me Section -->
+<section id="about" class="section-padding">
+    <div class="container">
+        <h2 class="section-title">About <span>Me</span></h2>
+        
+        <div class="row align-items-stretch">
+            <div class="col-lg-6 mb-5">
+                <div class="glass-card h-100 reveal">
+                    <h3 class="mb-4 text-gradient">My Journey</h3>
+                    <p class="text-secondary mb-4">
+                        {{ about.description or 'Detail your experience, core values, and professional history here. Use the Admin Dashboard to customize this text easily.' }}
+                    </p>
+                    {% if about.career_goal %}
+                    <h4 class="mt-4 mb-3">Career Goal</h4>
+                    <p class="text-secondary">
+                        {{ about.career_goal }}
+                    </p>
+                    {% endif %}
+                    
+                    <!-- Personal Info Grid -->
+                    <div class="row mt-5">
+                        {% if about.personal_info %}
+                            {% for key, val in about.personal_info.items() %}
+                                <div class="col-sm-6 mb-3">
+                                    <span class="text-muted d-block small">{{ key }}</span>
+                                    <span class="fw-semibold">{{ val }}</span>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Timelines -->
+            <div class="col-lg-6 mb-5">
+                <div class="glass-card h-100 reveal">
+                    <ul class="nav nav-pills mb-4 justify-content-center" id="timelineTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active btn-premium-outline border-0 bg-transparent text-primary" id="exp-tab" data-bs-toggle="pill" data-bs-target="#exp-pane" type="button" role="tab">Experience</button>
+                        </li>
+                        <li class="nav-item ms-3" role="presentation">
+                            <button class="nav-link btn-premium-outline border-0 bg-transparent text-primary" id="edu-tab" data-bs-toggle="pill" data-bs-target="#edu-pane" type="button" role="tab">Education</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="timelineTabContent">
+                        <!-- Experience timeline -->
+                        <div class="tab-pane fade show active" id="exp-pane" role="tabpanel" aria-labelledby="exp-tab">
+                            <div class="timeline mt-3">
+                                {% if about.experience %}
+                                    {% for exp in about.experience %}
+                                        <div class="timeline-item">
+                                            <div class="timeline-date">{{ exp.years }}</div>
+                                            <div class="timeline-title">{{ exp.role }}</div>
+                                            <div class="timeline-subtitle">{{ exp.company }}</div>
+                                            <p class="small text-muted">{{ exp.details }}</p>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted text-center py-4">No experience entries logged.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Education timeline -->
+                        <div class="tab-pane fade" id="edu-pane" role="tabpanel" aria-labelledby="edu-tab">
+                            <div class="timeline mt-3">
+                                {% if about.education %}
+                                    {% for edu in about.education %}
+                                        <div class="timeline-item">
+                                            <div class="timeline-date">{{ edu.years }}</div>
+                                            <div class="timeline-title">{{ edu.degree }}</div>
+                                            <div class="timeline-subtitle">{{ edu.institution }}</div>
+                                            <p class="small text-muted">{{ edu.details }}</p>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted text-center py-4">No education entries logged.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. Skills Section -->
+<section id="skills" class="section-padding bg-secondary-subtle" style="background-color: var(--bg-secondary);">
+    <div class="container">
+        <h2 class="section-title">My <span>Skills</span></h2>
+        <div class="row">
+            {% if skills %}
+                {% for skill in skills %}
+                    <div class="col-md-6 mb-4">
+                        <div class="glass-card skill-item reveal">
+                            <div class="skill-info">
+                                <span>
+                                    {% if skill.icon %}
+                                        <i class="{{ skill.icon }}"></i>
+                                    {% else %}
+                                        <i class="fas fa-code"></i>
+                                    {% endif %}
+                                    {{ skill.name }}
+                                </span>
+                                <span>{{ skill.percentage }}%</span>
+                            </div>
+                            <div class="progress-bar-glass">
+                                <div class="progress-bar-fill" data-percentage="{{ skill.percentage }}"></div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center text-muted">
+                    <p>No skills logged. Log in to dashboard to add your skills.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- 4. Services Section -->
+{% if services %}
+<section id="services" class="section-padding">
+    <div class="container">
+        <h2 class="section-title">Services <span>Offered</span></h2>
+        <div class="row">
+            {% for srv in services %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="glass-card service-card reveal">
+                        <div class="service-icon">
+                            <i class="{{ srv.icon or 'fas fa-laptop-code' }}"></i>
+                        </div>
+                        <h4 class="mb-3">{{ srv.name }}</h4>
+                        <p class="text-secondary small">{{ srv.description }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- 5. Projects Section -->
+<section id="projects" class="section-padding">
+    <div class="container">
+        <h2 class="section-title">Latest <span>Projects</span></h2>
+        
+        <!-- Tech Filters -->
+        <div class="project-filter reveal">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="python">Python</button>
+            <button class="filter-btn" data-filter="javascript">JavaScript</button>
+            <button class="filter-btn" data-filter="html">HTML/CSS</button>
+            <button class="filter-btn" data-filter="flask">Flask</button>
+        </div>
+        
+        <div class="row">
+            {% if projects %}
+                {% for proj in projects %}
+                    <div class="col-lg-4 col-md-6 mb-4 project-item" data-tech="{{ proj.technologies }}">
+                        <div class="glass-card project-card reveal">
+                            <div class="project-img-wrapper">
+                                {% if proj.primary_image %}
+                                    <img src="{{ url_for('static', filename=proj.primary_image) }}" alt="{{ proj.title }}" class="project-img">
+                                {% else %}
+                                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?fit=crop&w=400&h=300" alt="Placeholder Project" class="project-img">
+                                {% endif %}
+                                <div class="project-overlay">
+                                    <a href="{{ url_for('main.project_detail', project_id=proj.id) }}" title="View Details"><i class="fas fa-eye"></i></a>
+                                    {% if proj.github_url %}
+                                        <a href="{{ proj.github_url }}" target="_blank" title="GitHub Code"><i class="fab fa-github"></i></a>
+                                    {% endif %}
+                                    {% if proj.demo_url %}
+                                        <a href="{{ proj.demo_url }}" target="_blank" title="Live Demo"><i class="fas fa-link"></i></a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="project-details">
+                                <span class="text-muted small d-block mb-1">{{ proj.date }}</span>
+                                <h4 class="mb-3">{{ proj.title }}</h4>
+                                <p class="text-secondary small line-clamp-3">
+                                    {{ proj.description[:110] }}{{ '...' if proj.description|length > 110 else '' }}
+                                </p>
+                                <div class="project-tech">
+                                    {% for tech in proj.technologies.split(',') %}
+                                        <span class="tech-badge">{{ tech.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center text-muted">
+                    <p>No projects found. Add items via the admin console.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- 6. Certificates Section -->
+{% if certificates %}
+<section id="certificates" class="section-padding bg-secondary-subtle" style="background-color: var(--bg-secondary);">
+    <div class="container">
+        <h2 class="section-title">Certificates & <span>Credentials</span></h2>
+        <div class="row">
+            {% for cert in certificates %}
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="glass-card cert-card reveal">
+                        <div class="cert-img-container">
+                            {% if cert.image_path %}
+                                <img src="{{ url_for('static', filename=cert.image_path) }}" alt="{{ cert.title }}" class="cert-img lightbox-trigger">
+                            {% else %}
+                                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-secondary text-muted">
+                                    <i class="fas fa-certificate fa-3x"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <h5 class="mb-1 text-truncate" title="{{ cert.title }}">{{ cert.title }}</h5>
+                        <p class="small text-muted mb-2">{{ cert.issuer }} • {{ cert.date_earned }}</p>
+                        {% if cert.pdf_path %}
+                            <a href="{{ url_for('static', filename=cert.pdf_path) }}" target="_blank" class="btn btn-sm btn-premium-outline w-100 mt-2">
+                                <i class="fas fa-file-pdf me-2"></i>View PDF
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- 7. Achievements & Hobbies -->
+{% if achievements or hobbies %}
+<section id="achievements-hobbies" class="section-padding">
+    <div class="container">
+        <div class="row">
+            <!-- Achievements -->
+            <div class="col-lg-6 mb-5">
+                <h2 class="mb-4 fs-3">Achievements & <span>Awards</span></h2>
+                <div class="glass-card h-100 reveal">
+                    <ul class="list-unstyled">
+                        {% if achievements %}
+                            {% for ach in achievements %}
+                                <li class="d-flex mb-4">
+                                    <div class="text-warning fs-3 me-3"><i class="fas fa-trophy"></i></div>
+                                    <div>
+                                        <h5 class="mb-1">{{ ach.title }}</h5>
+                                        <p class="small text-muted mb-1">{{ ach.date }}</p>
+                                        <p class="small text-secondary">{{ ach.description }}</p>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="text-muted text-center py-4">No achievements logged.</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Hobbies -->
+            <div class="col-lg-6 mb-5">
+                <h2 class="mb-4 fs-3">Hobbies & <span>Interests</span></h2>
+                <div class="glass-card h-100 reveal">
+                    <div class="row">
+                        {% if hobbies %}
+                            {% for hob in hobbies %}
+                                <div class="col-sm-6 mb-4">
+                                    <div class="glass-card hobby-card py-3">
+                                        <div class="hobby-icon text-primary"><i class="{{ hob.icon or 'fas fa-heart' }}"></i></div>
+                                        <h5 class="mb-0 fs-6">{{ hob.name }}</h5>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="col-12 text-center text-muted py-4">No hobbies logged.</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- 8. Testimonials Section -->
+{% if testimonials %}
+<section id="testimonials" class="section-padding bg-secondary-subtle" style="background-color: var(--bg-secondary);">
+    <div class="container">
+        <h2 class="section-title">Client <span>Testimonials</span></h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for test in testimonials %}
+                            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                <div class="glass-card text-center p-5 reveal">
+                                    <i class="fas fa-quote-left text-primary fs-1 mb-4"></i>
+                                    <p class="lead text-secondary mb-4 italic">"{{ test.review }}"</p>
+                                    {% if test.client_photo %}
+                                        <img src="{{ url_for('static', filename=test.client_photo) }}" alt="{{ test.client_name }}" class="rounded-circle mb-3 border border-3 border-primary" style="width: 80px; height: 80px; object-fit: cover;">
+                                    {% endif %}
+                                    <h5 class="mb-0">{{ test.client_name }}</h5>
+                                    <span class="small text-muted">{{ test.client_role }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- 9. Contact Section -->
+<section id="contact" class="section-padding">
+    <div class="container">
+        <h2 class="section-title">Get In <span>Touch</span></h2>
+        
+        <div class="row align-items-stretch">
+            <!-- Details & Map -->
+            <div class="col-lg-5 mb-5">
+                <div class="glass-card h-100 reveal">
+                    <h3 class="mb-4">Contact Info</h3>
+                    
+                    {% if socials.contact_email %}
+                    <div class="contact-info-item">
+                        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                        <div>
+                            <span class="text-muted small d-block">Email Me</span>
+                            <a href="mailto:{{ socials.contact_email }}" class="text-decoration-none fw-semibold text-primary">{{ socials.contact_email }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if socials.phone_number %}
+                    <div class="contact-info-item">
+                        <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                        <div>
+                            <span class="text-muted small d-block">Call Me</span>
+                            <a href="tel:{{ socials.phone_number }}" class="text-decoration-none fw-semibold text-primary">{{ socials.phone_number }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if socials.address %}
+                    <div class="contact-info-item">
+                        <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div>
+                            <span class="text-muted small d-block">Office / Location</span>
+                            <span class="fw-semibold">{{ socials.address }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Embedded Google Maps -->
+                    {% if socials.google_maps_embed %}
+                        <div class="map-container mt-4" style="height: 220px;">
+                            <iframe src="{{ socials.google_maps_embed }}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Contact Message Form -->
+            <div class="col-lg-7 mb-5">
+                <div class="glass-card h-100 reveal">
+                    <h3 class="mb-4">Send a Message</h3>
+                    <form method="POST" action="{{ url_for('main.index') }}#contact">
+                        {{ form.csrf_token }}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label small fw-semibold">Name</label>
+                                {{ form.name(class="form-control form-control-glass", placeholder="Your Name") }}
+                                {% for error in form.name.errors %}
+                                    <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label small fw-semibold">Email Address</label>
+                                {{ form.email(class="form-control form-control-glass", placeholder="name@example.com") }}
+                                {% for error in form.email.errors %}
+                                    <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label small fw-semibold">Subject</label>
+                            {{ form.subject(class="form-control form-control-glass", placeholder="Discussion Topic") }}
+                            {% for error in form.subject.errors %}
+                                <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                                {% endfor %}
+                        </div>
+                        <div class="mb-4">
+                            <label for="message" class="form-label small fw-semibold">Your Message</label>
+                            {{ form.message(class="form-control form-control-glass", rows="5", placeholder="Type your message details here...") }}
+                            {% for error in form.message.errors %}
+                                <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <button type="submit" class="btn-premium w-100">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

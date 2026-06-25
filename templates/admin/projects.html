@@ -1,0 +1,168 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Manage Projects | Portfolio CMS{% endblock %}
+{% block page_title %}Projects Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Add Project Form -->
+    <div class="col-xl-5 mb-4">
+        <div class="admin-card shadow-sm">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-semibold">Add New Project</h5>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.csrf_token }}
+                
+                <div class="form-group-admin">
+                    <label for="title">Project Title</label>
+                    {{ form.title(class="form-control-admin", placeholder="e.g. E-Commerce API") }}
+                    {% for error in form.title.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="description">Project Description</label>
+                    {{ form.description(class="form-control-admin", rows="4", placeholder="Explain the features, technical architectural choices, challenges resolved...") }}
+                    {% for error in form.description.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="technologies">Technologies Used (Comma-separated)</label>
+                    {{ form.technologies(class="form-control-admin", placeholder="Python, Flask, SQLite, Docker") }}
+                    <span class="text-muted small d-block mt-1">Useful for project filter keywords.</span>
+                    {% for error in form.technologies.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="github_url" class="form-label small fw-semibold">GitHub Repository URL</label>
+                        {{ form.github_url(class="form-control form-control-sm", placeholder="https://github.com/...") }}
+                        {% for error in form.github_url.errors %}
+                            <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="demo_url" class="form-label small fw-semibold">Live Demo Link URL</label>
+                        {{ form.demo_url(class="form-control form-control-sm", placeholder="https://...") }}
+                        {% for error in form.demo_url.errors %}
+                            <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="date" class="form-label small fw-semibold">Completion Date</label>
+                        {{ form.date(class="form-control form-control-sm", placeholder="June 2026") }}
+                        {% for error in form.date.errors %}
+                            <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="project_file" class="form-label small fw-semibold">Upload Code/ZIP Attachment</label>
+                        {{ form.project_file(class="form-control form-control-sm") }}
+                        {% for error in form.project_file.errors %}
+                            <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="primary_image" class="form-label small fw-semibold">Primary Cover Image</label>
+                        {{ form.primary_image(class="form-control form-control-sm") }}
+                        {% for error in form.primary_image.errors %}
+                            <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="screenshots" class="form-label small fw-semibold">Gallery Screenshots</label>
+                        {{ form.screenshots(class="form-control form-control-sm", multiple=True) }}
+                        <span class="text-muted small d-block mt-1">Select multiple image files.</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-admin-primary w-100 py-2 mt-3">
+                    <i class="fas fa-plus me-1"></i> Add Project
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Projects List Table -->
+    <div class="col-xl-7 mb-4">
+        <div class="admin-card shadow-sm">
+            <div class="admin-card-header flex-column flex-sm-row gap-3">
+                <h5 class="mb-0 fw-semibold">Project Inventory</h5>
+                
+                <!-- Search bar -->
+                <form method="GET" class="d-flex" style="max-width: 250px;">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="search" class="form-control" placeholder="Search projects..." value="{{ search_query }}">
+                        <button type="submit" class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                {% if projects %}
+                    <table class="table admin-table mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Project info</th>
+                                <th>Tech Tags</th>
+                                <th style="width: 70px; text-align: center;">Screens</th>
+                                <th style="width: 120px; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for proj in projects %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">{{ proj.title }}</div>
+                                        <span class="text-muted small" style="font-size: 0.75rem;">{{ proj.date or 'No Date' }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="text-truncate" style="max-width: 180px;" title="{{ proj.technologies }}">
+                                            {% for tech in proj.technologies.split(',') %}
+                                                <span class="badge bg-secondary-subtle text-secondary small" style="font-size: 0.7rem;">{{ tech.strip() }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <span class="badge bg-primary rounded-pill">{{ proj.screenshots|length }}</span>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <div class="d-flex justify-content-center gap-1">
+                                            <a href="{{ url_for('admin.edit_project', project_id=proj.id) }}" class="btn btn-sm btn-outline-secondary py-1 px-2">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="POST" action="{{ url_for('admin.delete_project', project_id=proj.id) }}" onsubmit="return confirm('Delete project \'{{ proj.title }}\' and all associated screenshot files?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted text-center py-5 mb-0">No projects logged matching query.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

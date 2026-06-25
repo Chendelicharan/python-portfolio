@@ -1,0 +1,169 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}System Settings | Portfolio CMS{% endblock %}
+{% block page_title %}System Settings{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Left Column: Site & Contact Settings -->
+    <div class="col-lg-8 mb-4">
+        <div class="admin-card shadow-sm">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-semibold">General & Contact Settings</h5>
+            </div>
+            
+            {% if form %}
+            <form method="POST">
+                {{ form.csrf_token }}
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="site_name" class="form-label small fw-semibold">Website Title / Brand</label>
+                        {{ form.site_name(class="form-control-admin") }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="theme_default" class="form-label small fw-semibold">Default Site Theme</label>
+                        {{ form.theme_default(class="form-control-admin") }}
+                    </div>
+                </div>
+
+                <hr class="my-4">
+                <h6 class="mb-3 text-primary fw-semibold"><i class="fas fa-address-book me-2"></i>Contact Details</h6>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="contact_email" class="form-label small fw-semibold">Display Contact Email</label>
+                        {{ form.contact_email(class="form-control-admin", type="email") }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="phone_number" class="form-label small fw-semibold">Display Phone Number</label>
+                        {{ form.phone_number(class="form-control-admin") }}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="address" class="form-label small fw-semibold">Display Office / Home Address</label>
+                    {{ form.address(class="form-control-admin") }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="google_maps_embed" class="form-label small fw-semibold">Google Maps Embed URL</label>
+                    {{ form.google_maps_embed(class="form-control-admin", rows="2") }}
+                    <span class="text-muted small d-block mt-1">Paste the source link (<code>src="..."</code>) from Google Map's standard iframe embed code.</span>
+                </div>
+
+                <hr class="my-4">
+                <h6 class="mb-3 text-primary fw-semibold"><i class="fas fa-share-nodes me-2"></i>Social Profiles Links</h6>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="github_url" class="form-label small fw-semibold"><i class="fab fa-github me-1"></i> GitHub URL</label>
+                        {{ form.github_url(class="form-control-admin") }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="linkedin_url" class="form-label small fw-semibold"><i class="fab fa-linkedin me-1"></i> LinkedIn URL</label>
+                        {{ form.linkedin_url(class="form-control-admin") }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="twitter_url" class="form-label small fw-semibold"><i class="fab fa-twitter me-1"></i> Twitter / X URL</label>
+                        {{ form.twitter_url(class="form-control-admin") }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="facebook_url" class="form-label small fw-semibold"><i class="fab fa-facebook me-1"></i> Facebook URL</label>
+                        {{ form.facebook_url(class="form-control-admin") }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="instagram_url" class="form-label small fw-semibold"><i class="fab fa-instagram me-1"></i> Instagram URL</label>
+                    {{ form.instagram_url(class="form-control-admin") }}
+                </div>
+
+                <hr class="my-4">
+                <h6 class="mb-3 text-primary fw-semibold"><i class="fas fa-bell me-2"></i>Email Notifications (SMTP Configuration)</h6>
+                
+                <div class="form-check form-switch mb-3">
+                    {{ form.email_notifications(class="form-check-input", role="switch") }}
+                    <label class="form-check-label small fw-semibold" for="email_notifications">Enable Form Submission Email Alerts</label>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="smtp_host" class="form-label small fw-semibold">SMTP Host Server</label>
+                        {{ form.smtp_host(class="form-control-admin", placeholder="smtp.gmail.com") }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="smtp_port" class="form-label small fw-semibold">SMTP Port</label>
+                        {{ form.smtp_port(class="form-control-admin", type="number", placeholder="587") }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="smtp_user" class="form-label small fw-semibold">SMTP Username</label>
+                        {{ form.smtp_user(class="form-control-admin", placeholder="user@gmail.com") }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="smtp_pass" class="form-label small fw-semibold">SMTP Password</label>
+                        {{ form.smtp_pass(class="form-control-admin", type="password", placeholder="••••••••••••") }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="smtp_sender" class="form-label small fw-semibold">Email Sender Address (From)</label>
+                    {{ form.smtp_sender(class="form-control-admin", placeholder="notifications@example.com") }}
+                </div>
+
+                <button type="submit" class="btn btn-admin-primary mt-4 w-100 py-2">
+                    <i class="fas fa-save me-1"></i> Save Configuration Settings
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Right Column: Change Password -->
+    <div class="col-lg-4 mb-4">
+        <div class="admin-card shadow-sm">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-semibold">Change Credentials</h5>
+            </div>
+            
+            <form method="POST" action="{{ url_for('auth.change_password') }}">
+                {{ change_pw_form.csrf_token }}
+                
+                <div class="form-group-admin">
+                    <label for="current_password" class="small fw-semibold">Current Password</label>
+                    {{ change_pw_form.current_password(class="form-control-admin", placeholder="••••••••") }}
+                    {% for error in change_pw_form.current_password.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="new_password" class="small fw-semibold">New Password</label>
+                    {{ change_pw_form.new_password(class="form-control-admin", placeholder="Min 8 characters") }}
+                    {% for error in change_pw_form.new_password.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="confirm_password" class="small fw-semibold">Confirm Password</label>
+                    {{ change_pw_form.confirm_password(class="form-control-admin", placeholder="••••••••") }}
+                    {% for error in change_pw_form.confirm_password.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn-danger w-100 py-2 mt-4">
+                    <i class="fas fa-key me-1"></i> Update Password
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

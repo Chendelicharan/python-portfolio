@@ -1,0 +1,133 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Manage Certificates | Portfolio CMS{% endblock %}
+{% block page_title %}Certificates Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Add Certificate Form -->
+    <div class="col-lg-4 mb-4">
+        <div class="admin-card shadow-sm">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-semibold">Add New Certificate</h5>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.csrf_token }}
+                
+                <div class="form-group-admin">
+                    <label for="title">Certificate Title</label>
+                    {{ form.title(class="form-control-admin", placeholder="e.g. AWS Solutions Architect") }}
+                    {% for error in form.title.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="issuer">Issuing Organization</label>
+                    {{ form.issuer(class="form-control-admin", placeholder="e.g. Amazon Web Services") }}
+                    {% for error in form.issuer.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="date_earned">Date Earned</label>
+                    {{ form.date_earned(class="form-control-admin", placeholder="e.g. May 2026") }}
+                    {% for error in form.date_earned.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="image_file">Certificate Image Badge</label>
+                    {{ form.image_file(class="form-control form-control-sm") }}
+                    <span class="text-muted small d-block mt-1">Accepts PNG, JPG, JPEG. Max 16MB.</span>
+                    {% for error in form.image_file.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="pdf_file">Full PDF Certificate File</label>
+                    {{ form.pdf_file(class="form-control form-control-sm") }}
+                    <span class="text-muted small d-block mt-1">Accepts PDF documents only. Max 16MB.</span>
+                    {% for error in form.pdf_file.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn-admin-primary w-100 py-2 mt-3">
+                    <i class="fas fa-plus me-1"></i> Add Certificate
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Certificates List Grid -->
+    <div class="col-lg-8 mb-4">
+        <div class="admin-card shadow-sm">
+            <div class="admin-card-header flex-column flex-sm-row gap-3">
+                <h5 class="mb-0 fw-semibold">Certificates Gallery</h5>
+                
+                <!-- Search bar -->
+                <form method="GET" class="d-flex" style="max-width: 250px;">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="search" class="form-control" placeholder="Search certificates..." value="{{ search_query }}">
+                        <button type="submit" class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-2 g-3 mt-1">
+                {% if certificates %}
+                    {% for cert in certificates %}
+                        <div class="col">
+                            <div class="p-3 border rounded shadow-sm h-100 d-flex flex-column justify-content-between bg-light-subtle">
+                                <div>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3 border rounded overflow-hidden bg-white" style="width: 60px; height: 60px; flex-shrink: 0;">
+                                            {% if cert.image_path %}
+                                                <img src="{{ url_for('static', filename=cert.image_path) }}" alt="badge" class="w-100 h-100 object-fit-cover">
+                                            {% else %}
+                                                <div class="w-100 h-100 d-flex align-items-center justify-content-center text-secondary">
+                                                    <i class="fas fa-certificate"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold text-truncate" style="max-width: 180px;" title="{{ cert.title }}">{{ cert.title }}</h6>
+                                            <span class="small text-muted">{{ cert.issuer }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="small text-muted mb-2">Earned: {{ cert.date_earned or 'N/A' }}</div>
+                                </div>
+                                
+                                <div class="border-top pt-2 mt-2 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        {% if cert.pdf_path %}
+                                            <a href="{{ url_for('static', filename=cert.pdf_path) }}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.8rem;">
+                                                <i class="fas fa-file-pdf text-danger me-1"></i>PDF
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <form method="POST" action="{{ url_for('admin.delete_certificate', cert_id=cert.id) }}" onsubmit="return confirm('Delete certificate \'{{ cert.title }}\'?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" style="font-size: 0.8rem;">
+                                            <i class="fas fa-trash-alt me-1"></i>Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <p class="text-muted text-center py-5 mb-0">No certificates logged matching query.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

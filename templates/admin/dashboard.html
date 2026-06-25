@@ -1,0 +1,131 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Dashboard | Portfolio CMS{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<!-- 1. Stats Counter Row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-card shadow-sm">
+            <div class="stat-icon"><i class="fas fa-project-diagram"></i></div>
+            <span class="text-muted small">Total Projects</span>
+            <h3 class="fw-bold mb-0 mt-1">{{ total_projects }}</h3>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-card shadow-sm">
+            <div class="stat-icon" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fas fa-envelope"></i></div>
+            <span class="text-muted small">Messages Inbox</span>
+            <h3 class="fw-bold mb-0 mt-1">
+                {{ total_messages }} 
+                {% if unread_messages > 0 %}
+                    <span class="badge bg-danger small fs-6 ms-2" style="font-size: 0.75rem !important;">{{ unread_messages }} New</span>
+                {% endif %}
+            </h3>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-card shadow-sm">
+            <div class="stat-icon" style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b;"><i class="fas fa-certificate"></i></div>
+            <span class="text-muted small">Certificates</span>
+            <h3 class="fw-bold mb-0 mt-1">{{ total_certificates }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-card shadow-sm">
+            <div class="stat-icon" style="background-color: rgba(236, 72, 153, 0.1); color: #ec4899;"><i class="fas fa-users"></i></div>
+            <span class="text-muted small">Unique Visitors</span>
+            <h3 class="fw-bold mb-0 mt-1">{{ visitor_count }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 2. Recent Messages Section -->
+    <div class="col-xl-8 col-lg-7 mb-4">
+        <div class="admin-card h-100 shadow-sm">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-semibold">Recent Messages</h5>
+                <a href="{{ url_for('admin.messages') }}" class="btn btn-sm btn-outline-primary">View Inbox</a>
+            </div>
+            
+            <div class="table-responsive">
+                {% if recent_messages %}
+                    <table class="table admin-table mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Sender</th>
+                                <th>Subject</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for msg in recent_messages %}
+                                <tr class="{% if not msg.is_read %}message-row-unread{% endif %}">
+                                    <td>
+                                        <div class="fw-semibold">{{ msg.name }}</div>
+                                        <div class="small text-muted" style="font-size: 0.75rem;">{{ msg.email }}</div>
+                                    </td>
+                                    <td class="text-truncate" style="max-width: 200px;">{{ msg.subject }}</td>
+                                    <td class="small text-muted">{{ msg.timestamp.strftime('%b %d, %Y') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('admin.messages') }}" class="btn btn-sm btn-light py-1 px-2 border">
+                                            <i class="fas fa-envelope-open-text"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted text-center py-5 mb-0">No messages received yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Status Bar Section -->
+    <div class="col-xl-4 col-lg-5 mb-4">
+        <div class="admin-card h-100 shadow-sm">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-semibold">CMS Status</h5>
+            </div>
+            
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-bottom-0 py-3">
+                    <div>
+                        <div class="fw-semibold">Resume Status</div>
+                        <span class="small text-muted">Available for user downloads</span>
+                    </div>
+                    {% if resume_uploaded %}
+                        <span class="badge bg-success py-2 px-3 rounded-pill"><i class="fas fa-check me-1"></i> Active</span>
+                    {% else %}
+                        <span class="badge bg-secondary py-2 px-3 rounded-pill"><i class="fas fa-times me-1"></i> Missing</span>
+                    {% endif %}
+                </li>
+                
+                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-bottom-0 py-3">
+                    <div>
+                        <div class="fw-semibold">Skills Inventory</div>
+                        <span class="small text-muted">Active developer indicators</span>
+                    </div>
+                    <span class="badge bg-primary py-2 px-3 rounded-pill">{{ total_skills }} Skills</span>
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-bottom-0 py-3">
+                    <div>
+                        <div class="fw-semibold">Default Site Theme</div>
+                        <span class="small text-muted">Configured initial layout mode</span>
+                    </div>
+                    <span class="badge bg-dark py-2 px-3 rounded-pill text-uppercase">Dark Mode</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

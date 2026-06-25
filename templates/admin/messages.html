@@ -1,0 +1,120 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Messages Inbox | Portfolio CMS{% endblock %}
+{% block page_title %}Messages Inbox{% endblock %}
+
+{% block content %}
+<div class="admin-card shadow-sm">
+    <div class="admin-card-header flex-column flex-sm-row gap-3">
+        <h5 class="mb-0 fw-semibold">Visitor Enquiries</h5>
+        
+        <!-- Search bar -->
+        <form method="GET" class="d-flex" style="max-width: 250px;">
+            <div class="input-group input-group-sm">
+                <input type="text" name="search" class="form-control" placeholder="Search inbox..." value="{{ search_query }}">
+                <button type="submit" class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Accordion/Collapse Message list -->
+    <div class="accordion accordion-flush mt-2" id="messageInbox">
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="accordion-item border rounded-3 mb-3 overflow-hidden shadow-sm {% if not msg.is_read %}message-row-unread{% endif %}" id="msg-card-{{ msg.id }}">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed bg-transparent py-3 px-4" type="button" data-bs-toggle="collapse" data-bs-target="#msg-body-{{ msg.id }}" aria-expanded="false" aria-controls="msg-body-{{ msg.id }}" data-msg-id="{{ msg.id }}">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between w-100 pe-3 gap-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3 text-secondary">
+                                        <i class="fas {% if msg.is_read %}fa-envelope-open{% else %}fa-envelope text-primary{% endif %}" id="msg-icon-{{ msg.id }}"></i>
+                                    </div>
+                                    <div>
+                                        <span class="fw-semibold text-main">{{ msg.name }}</span>
+                                        <span class="text-muted small ms-2 d-none d-sm-inline">{{ msg.email }}</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="small fw-semibold text-truncate d-none d-md-inline" style="max-width: 250px;">{{ msg.subject }}</span>
+                                    <span class="small text-muted">{{ msg.timestamp.strftime('%b %d, %Y %I:%M %p') }}</span>
+                                </div>
+                            </div>
+                        </button>
+                    </h2>
+                    
+                    <div id="msg-body-{{ msg.id }}" class="accordion-collapse collapse" data-bs-parent="#messageInbox">
+                        <div class="accordion-body bg-light-subtle p-4 border-top">
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-2">
+                                    <span class="text-muted small d-block">Sender Details</span>
+                                    <strong>{{ msg.name }}</strong> &lt;<a href="mailto:{{ msg.email }}">{{ msg.email }}</a>&gt;
+                                </div>
+                                <div class="col-md-6 mb-2 text-md-end">
+                                    <span class="text-muted small d-block">Subject</span>
+                                    <strong class="text-main">{{ msg.subject }}</strong>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="my-4" style="white-space: pre-wrap; line-height: 1.6; font-size: 0.95rem;">
+                                {{ msg.message }}
+                            </div>
+                            
+                            <div class="border-top pt-3 mt-4 d-flex justify-content-end gap-2">
+                                <a href="mailto:{{ msg.email }}?subject=Re: {{ msg.subject }}" class="btn btn-sm btn-outline-primary px-3">
+                                    <i class="fas fa-reply me-1"></i> Reply
+                                </a>
+                                <form method="POST" action="{{ url_for('admin.delete_message', msg_id=msg.id) }}" onsubmit="return confirm('Are you sure you want to delete this message?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger px-3">
+                                        <i class="fas fa-trash-alt me-1"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted text-center py-5 mb-0">No messages logged in inbox.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const accordions = document.querySelectorAll('#messageInbox .accordion-collapse');
+    
+    accordions.forEach(collapse => {
+        collapse.addEventListener('show.bs.collapse', (e) => {
+            const btn = e.target.closest('.accordion-item').querySelector('.accordion-button');
+            const msgId = btn.getAttribute('data-msg-id');
+            const msgCard = document.getElementById(`msg-card-${msgId}`);
+            const msgIcon = document.getElementById(`msg-icon-${msgId}`);
+            
+            // Check if card has unread class
+            if (msgCard && msgCard.classList.contains('message-row-unread')) {
+                // Send AJAX fetch request to mark as read
+                fetch(`/admin/messages/read/${msgId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token() }}'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Update UI classes
+                        msgCard.classList.remove('message-row-unread');
+                        if (msgIcon) {
+                            msgIcon.className = 'fas fa-envelope-open';
+                        }
+                    }
+                })
+                .catch(err => console.error('Error marking message read:', err));
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

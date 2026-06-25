@@ -1,0 +1,149 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Edit About Me | Portfolio CMS{% endblock %}
+{% block page_title %}Manage About Me Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main profile form -->
+    <div class="col-lg-7 mb-4">
+        <div class="admin-card shadow-sm">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-semibold">General Profile Details</h5>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.csrf_token }}
+                
+                <!-- Hidden inputs for Timeline JSON fields (managed by javascript) -->
+                <textarea id="education_hidden" name="education_hidden" class="d-none">{{ about._education }}</textarea>
+                <textarea id="experience_hidden" name="experience_hidden" class="d-none">{{ about._experience }}</textarea>
+
+                <div class="form-group-admin">
+                    <label for="name">Full Name</label>
+                    {{ form.name(class="form-control-admin") }}
+                    {% for error in form.name.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="title">Professional Title</label>
+                    {{ form.title(class="form-control-admin") }}
+                    {% for error in form.title.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="bio">Short Hero Bio (Brief Summary)</label>
+                    {{ form.bio(class="form-control-admin", rows="3") }}
+                    {% for error in form.bio.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="description">Full Description (About Me details)</label>
+                    {{ form.description(class="form-control-admin", rows="5") }}
+                    {% for error in form.description.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="career_goal">Career Goals</label>
+                    {{ form.career_goal(class="form-control-admin", rows="3") }}
+                    {% for error in form.career_goal.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="photo" class="form-label small fw-semibold">Profile Photo Upload</label>
+                        {{ form.photo(class="form-control form-control-sm") }}
+                        <span class="text-muted small d-block mt-1">Accepts PNG, JPG, JPEG. Max 16MB.</span>
+                        {% for error in form.photo.errors %}
+                            <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="resume" class="form-label small fw-semibold">Resume Document Upload</label>
+                        {{ form.resume(class="form-control form-control-sm") }}
+                        <span class="text-muted small d-block mt-1">Accepts PDF, DOCX, ZIP. Max 16MB.</span>
+                        {% for error in form.resume.errors %}
+                            <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-admin-primary mt-4 py-2 px-4 w-100">
+                    <i class="fas fa-save me-2"></i> Save Profile Details
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Timeline & File status section -->
+    <div class="col-lg-5 mb-4">
+        <!-- Asset Previews -->
+        <div class="admin-card mb-4 shadow-sm">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-semibold">Profile Assets</h5>
+            </div>
+            
+            <div class="text-center mb-4">
+                <span class="text-muted d-block small mb-2">Current Photo</span>
+                {% if about.photo_path %}
+                    <img src="{{ url_for('static', filename=about.photo_path) }}" alt="Avatar" class="rounded-circle border" style="width: 120px; height: 120px; object-fit: cover;">
+                {% else %}
+                    <div class="rounded-circle border bg-secondary mx-auto d-flex align-items-center justify-content-center text-white" style="width: 120px; height: 120px;">
+                        <i class="fas fa-user fa-3x"></i>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="border-top pt-3">
+                <span class="text-muted d-block small mb-2">Current Resume</span>
+                {% if about.resume_path %}
+                    <div class="d-flex align-items-center justify-content-between p-2 bg-light border rounded">
+                        <span class="small text-truncate me-2"><i class="fas fa-file-pdf text-danger me-2"></i>{{ about.resume_path.split('/')[-1] }}</span>
+                        <div class="d-flex gap-1">
+                            <a href="{{ url_for('static', filename=about.resume_path) }}" download class="btn btn-sm btn-outline-secondary py-0 px-2"><i class="fas fa-download"></i></a>
+                            <form method="POST" action="{{ url_for('admin.delete_resume') }}" onsubmit="return confirm('Are you sure you want to delete this resume?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2"><i class="fas fa-trash-alt"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-muted small mb-0">No resume document uploaded.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Dynamic Experience Timeline -->
+        <div class="admin-card mb-4 shadow-sm">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-semibold">Experience Timeline</h5>
+                <button type="button" id="add-experience-btn" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> Add</button>
+            </div>
+            <div id="experience-fields-container" style="max-height: 400px; overflow-y: auto; padding-right: 5px;">
+                <!-- Timeline items rendered dynamically by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Dynamic Education Timeline -->
+        <div class="admin-card shadow-sm">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-semibold">Education Timeline</h5>
+                <button type="button" id="add-education-btn" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> Add</button>
+            </div>
+            <div id="education-fields-container" style="max-height: 400px; overflow-y: auto; padding-right: 5px;">
+                <!-- Timeline items rendered dynamically by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Edit Project | Portfolio CMS{% endblock %}
+{% block page_title %}Edit Project: {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Edit Project Form -->
+    <div class="col-lg-8 mb-4">
+        <div class="admin-card shadow-sm">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-semibold">Update Project Details</h5>
+                <a href="{{ url_for('admin.projects') }}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Back</a>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.csrf_token }}
+                
+                <div class="form-group-admin">
+                    <label for="title">Project Title</label>
+                    {{ form.title(class="form-control-admin") }}
+                    {% for error in form.title.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="description">Project Description</label>
+                    {{ form.description(class="form-control-admin", rows="6") }}
+                    {% for error in form.description.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-admin">
+                    <label for="technologies">Technologies Used (Comma-separated)</label>
+                    {{ form.technologies(class="form-control-admin") }}
+                    {% for error in form.technologies.errors %}
+                        <span class="text-danger small mt-1 d-block">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="github_url" class="form-label small fw-semibold">GitHub Repository URL</label>
+                        {{ form.github_url(class="form-control form-control-sm") }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="demo_url" class="form-label small fw-semibold">Live Demo Link URL</label>
+                        {{ form.demo_url(class="form-control form-control-sm") }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="date" class="form-label small fw-semibold">Completion Date</label>
+                        {{ form.date(class="form-control form-control-sm") }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="project_file" class="form-label small fw-semibold">Replace Code/ZIP Attachment</label>
+                        {{ form.project_file(class="form-control form-control-sm") }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="primary_image" class="form-label small fw-semibold">Replace Cover Image</label>
+                        {{ form.primary_image(class="form-control form-control-sm") }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="screenshots" class="form-label small fw-semibold">Add More Gallery Screenshots</label>
+                        {{ form.screenshots(class="form-control form-control-sm", multiple=True) }}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-admin-primary mt-4 w-100 py-2">
+                    <i class="fas fa-save me-1"></i> Save Project Changes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Previews Sidebar -->
+    <div class="col-lg-4 mb-4">
+        <!-- Cover Preview -->
+        <div class="admin-card mb-4 shadow-sm">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-semibold">Primary Cover</h5>
+            </div>
+            
+            <div class="text-center">
+                {% if project.primary_image %}
+                    <img src="{{ url_for('static', filename=project.primary_image) }}" alt="Cover" class="img-fluid rounded border shadow-sm" style="max-height: 180px; object-fit: cover;">
+                {% else %}
+                    <div class="w-100 py-5 bg-secondary-subtle border text-center text-muted rounded">
+                        <i class="fas fa-image fa-3x mb-2"></i>
+                        <div class="small">No Cover Image Uploaded</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Screenshots Gallery list -->
+        <div class="admin-card shadow-sm">
+            <div class="admin-card-header">
+                <h5 class="mb-0 fw-semibold">Screenshots ({{ project.screenshots|length }})</h5>
+            </div>
+            
+            {% if project.screenshots %}
+                <div class="row g-2" style="max-height: 400px; overflow-y: auto;">
+                    {% for shot in project.screenshots %}
+                        <div class="col-6 position-relative mb-2">
+                            <img src="{{ url_for('static', filename=shot.image_path) }}" alt="Screenshot" class="img-fluid rounded border" style="height: 100px; width: 100%; object-fit: cover;">
+                            
+                            <form method="POST" action="{{ url_for('admin.delete_screenshot', project_id=project.id, shot_id=shot.id) }}" onsubmit="return confirm('Delete this screenshot?');" class="position-absolute top-0 end-0 m-1">
+                                <button type="submit" class="btn btn-danger btn-sm p-1" style="line-height: 1; border-radius: 4px;" title="Delete screenshot">
+                                    <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                                </button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted small mb-0 text-center py-4">No gallery screenshots added.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
