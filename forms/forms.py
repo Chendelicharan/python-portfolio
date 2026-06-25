@@ -130,3 +130,7 @@ class SettingsForm(FlaskForm):
     smtp_user = StringField('SMTP Username / Email', validators=[Optional(), Length(max=120)])
     smtp_pass = PasswordField('SMTP Password', validators=[Optional()])
     smtp_sender = StringField('Sender Address (From)', validators=[Optional(), Length(max=120)])
+
+class ForgotPasswordForm(FlaskForm):
+    email = StringField('Registered Email Address', validators=[DataRequired(), Email(), Length(max=120)])
+
