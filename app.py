@@ -48,10 +48,19 @@ def create_app():
     def page_not_found(e):
         from models.models import Setting
         socials = {}
-        for key in ['contact_email', 'site_name']:
-            s = Setting.query.filter_by(key=key).first()
-            socials[key] = s.value if s else ''
-        return render_template('404.html', socials=socials), 404
+        theme = 'dark'
+        try:
+            for key in ['contact_email', 'site_name']:
+                s = Setting.query.filter_by(key=key).first()
+                socials[key] = s.value if s else ''
+            
+            theme_default = Setting.query.filter_by(key='theme_default').first()
+            if theme_default:
+                theme = theme_default.value
+        except Exception:
+            pass # Fallback to empty socials and dark theme if DB is not ready
+            
+        return render_template('404.html', socials=socials, theme=theme), 404
 
     return app
 
